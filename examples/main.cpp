@@ -1,4 +1,4 @@
-#include "../source/lika.hpp"
+#include "../include/lika.hpp"
 #include <iostream>
 
 using namespace Lika;
