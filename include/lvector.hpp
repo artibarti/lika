@@ -1,6 +1,4 @@
-
-#ifndef LIKA_VECTOR_H
-#define LIKA_VECTOR_H
+#pragma once
 
 #include <iostream>
 #include <vector>
@@ -8,13 +6,14 @@
 #include <cmath>
 #include <stdexcept>
 #include <algorithm>
-#include <boost/type_index.hpp>
 
 namespace Lika 
 {
 	template<typename T, int S>
 	class Vector 
 	{
+		using value_type = T;
+
 		private:
 			int size = S;
 			std::vector<T> values;
@@ -85,9 +84,7 @@ namespace Lika
 		double retrunVal = 0;
 
 		for (int i = 0; i < size; i++)
-		{
 			retrunVal += pow(abs(values[i]), 2);
-		}
 
 		return pow(retrunVal, 0.5);
 	}
@@ -150,9 +147,7 @@ namespace Lika
 		Vector<T,S> result;
 
 		for (int i = 0; i < size; i++)
-		{
 			result[i] = values[i] + v.get(i);
-		}		
 
 		return result;
 	}
@@ -163,9 +158,7 @@ namespace Lika
 		Vector<T,S> result;
 
 		for (int i = 0; i < size; i++)
-		{
 			result[i] = v.get(i) - this->get(i);
-		}		
 
 		return result;
 	}
@@ -188,16 +181,9 @@ namespace Lika
 	template<typename T, int S>
 	void Vector<T,S>::showInfo()
 	{
-		std::cout << "Vector of type " << boost::typeindex::type_id<T>().pretty_name() 
-			<< " and size of " << S << std::endl;
-
-		for (int i = 0; i<size; i++)
-		{
-			std::cout << values[i] << "  ";
-		}
+		std::for_each(values.begin(), values.end(), [](T& val) {std::cout << val << " "; });
 		std::cout << std::endl;
 	}
-
 
 	typedef Vector<int, 2> vec2i;
 	typedef Vector<int, 3> vec3i;
@@ -214,5 +200,3 @@ namespace Lika
 	typedef Vector<float, 4> vec4f;
 	typedef Vector<float, 5> vec5f;
 };
-
-#endif

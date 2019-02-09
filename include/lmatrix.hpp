@@ -1,6 +1,5 @@
 
-#ifndef LIKA_MATRIX_H
-#define LIKA_MATRIX_H
+#pragma once
 
 #include <iostream>
 #include <vector>
@@ -8,7 +7,6 @@
 #include <cmath>
 #include <stdexcept>
 #include <algorithm>
-#include <boost/type_index.hpp>
 #include "lvector.hpp"
 
 namespace Lika
@@ -139,9 +137,6 @@ namespace Lika
     template<typename T, int V, int H>
     void Matrix<T,V,H>::showInfo()
     {
-		std::cout << "Matrix of type " << boost::typeindex::type_id<T>().pretty_name() 
-            << " with " << size_v << " rows and " << size_h << " columns" << std::endl;
-    
         for (int rows = 0; rows<size_v; rows++)
         {
             for (int cols = 0; cols<size_h; cols++)
@@ -256,5 +251,3 @@ namespace Lika
     typedef Matrix<double, 4, 4> mat4x4d;
 
 };
-
-#endif
