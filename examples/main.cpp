@@ -1,26 +1,32 @@
 #include "../include/lika.hpp"
 #include <iostream>
 
-using namespace Lika;
+using namespace lika;
+
+template<typename T>
+void printMatrix(Matrix<T>& matrix) {
+  
+  for (unsigned rowIndex = 0; rowIndex < matrix.getRowCount(); rowIndex++) {
+    for (unsigned colIndex = 0; colIndex < matrix.getColCount(); colIndex++) {
+      std::cout << " " << matrix[rowIndex][colIndex];
+    }
+    std::cout << std::endl;
+  }
+}
 
 int main(int argc, char** argv)
 {
-    std::cout << "Lika math library example" << std::endl;
+    std::cout << "Lika matrix library example" << std::endl;
 
-    vec2d v1 {2,5};
-    vec2d v2 {4,1};
+    matrix_d mat1(2,5);
+    matrix_d mat2(3,4);
 
-    vec2d v3 = v1 + v2;
+    mat1[0][0] = 10;
+    mat2[1][2] = 2;
 
-    v2.showInfo();
-
-    mat2x2d m1 
-    {
-        {2,5},
-        {1,5}
-    };
-
-    vec2d v4 = m1*v3;
-    v4.showInfo();
+    std::cout << "mat1: " << std::endl;
+    printMatrix(mat1);
+    std::cout << "mat2: " << std::endl;
+    printMatrix(mat2);
 
 }
