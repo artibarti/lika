@@ -6,8 +6,8 @@ using namespace lika;
 template<typename T>
 void printMatrix(Matrix<T>& matrix) {
   
-  for (unsigned rowIndex = 0; rowIndex < matrix.getRowCount(); rowIndex++) {
-    for (unsigned colIndex = 0; colIndex < matrix.getColCount(); colIndex++) {
+  for (unsigned rowIndex = 0; rowIndex < matrix.rowCount(); rowIndex++) {
+    for (unsigned colIndex = 0; colIndex < matrix.colCount(); colIndex++) {
       std::cout << " " << matrix[rowIndex][colIndex];
     }
     std::cout << std::endl;
@@ -22,7 +22,14 @@ int main(int argc, char** argv)
     matrix_d mat2(3,4);
 
     mat1[0][0] = 10;
-    mat2[1][2] = 2;
+
+    float hint = 0;
+    for (unsigned rowIndex = 0; rowIndex < mat1.rowCount(); rowIndex++) {
+      for (unsigned colIndex = 0; colIndex < mat1.colCount(); colIndex++) {
+        mat1[rowIndex][colIndex] = hint;
+        hint++;
+      }
+    }
 
     std::cout << "mat1: " << std::endl;
     printMatrix(mat1);

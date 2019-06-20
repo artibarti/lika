@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "shape2d.h"
+#include "access_rule.h"
 #include "limited_access_matrix.h"
 
 namespace lika {
@@ -14,19 +15,19 @@ class Matrix {
     std::shared_ptr<T> matrixData_;
     unsigned elementCount_;
     Shape2d shape_;
-
-    void getIndicesInRow(unsigned rowIndex, std::vector<unsigned>& result) const;
-    void getIndicesInCol(unsigned colIndex, std::vector<unsigned>& result) const;
+    
+    AccessRule getAccessRuleForRow(unsigned rowIndex);
 
   public:
-    Matrix<T>() {}
+    Matrix() {}
+    Matrix(Shape2d shape);
     Matrix(const Matrix<T>& other);
     Matrix(unsigned rows, unsigned cols);
     Matrix<T>& operator= (const Matrix<T>& other);
 
     unsigned getElementCount() const;
-    unsigned getRowCount() const;
-    unsigned getColCount() const;
+    unsigned rowCount() const;
+    unsigned colCount() const;
     Shape2d getShape() const;
 
     void reshape(unsigned rows, unsigned cols);
@@ -41,8 +42,8 @@ class Matrix {
     LimitedAccessMatrix<T> operator[] (unsigned rowIndex);
     const LimitedAccessMatrix<T> operator[] (unsigned rowIndex) const;
 
-    T& getElementByGlobalIndex(unsigned index);
-    const T& getElementByGlobalIndex(unsigned index) const;
+    T& at(unsigned index);
+    const T& at(unsigned index) const;
 
     void setRow(unsigned rowIndex, const std::vector<T>& row);
     void setColumn(unsigned colIndex, const std::vector<T>& col);
@@ -54,13 +55,18 @@ class Matrix {
 };
 
 template<typename T>
+Matrix<T>::Matrix(Shape2d shape) {
+  reshape(shape);
+}
+
+template<typename T>
 Matrix<T>::Matrix(unsigned rows, unsigned cols) {
   reshape(rows, cols);
 }
 
 template<typename T>
 Matrix<T>::Matrix(const Matrix<T>& other) {
-  reshape(other.getRowCount(), other.getColCount());
+  reshape(other.shape_);
   for (unsigned rowIndex = 0; rowIndex < other.elementCount_; rowIndex++) {
     matrixData_.get()[rowIndex] = other.matrixData_.get()[rowIndex];
   }
@@ -68,7 +74,7 @@ Matrix<T>::Matrix(const Matrix<T>& other) {
 
 template<typename T>
 Matrix<T>& Matrix<T>::operator= (const Matrix<T>& other) {
-  reshape(other.getRowCount(), other.getColCount());
+  reshape(other.rowCount(), other.colCount());
   for (unsigned rowIndex = 0; rowIndex < other.elementCount_; rowIndex++) {
     matrixData_.get()[rowIndex] = other.matrixData_.get()[rowIndex];
   }
@@ -81,12 +87,12 @@ unsigned Matrix<T>::getElementCount() const {
 }
 
 template<typename T>
-unsigned Matrix<T>::getRowCount() const {
+unsigned Matrix<T>::rowCount() const {
   return shape_.x;
 }
 
 template<typename T>
-unsigned Matrix<T>::getColCount()  const {
+unsigned Matrix<T>::colCount()  const {
   return shape_.y;
 }
 
@@ -141,9 +147,7 @@ const T& Matrix<T>::getElement(unsigned row, unsigned col) const {
 template<typename T>
 LimitedAccessMatrix<T> Matrix<T>::operator[] (unsigned rowIndex) {
   if (rowIndex < shape_.x) {
-    std::vector<unsigned> rowIndices;
-    getIndicesInRow(rowIndex, rowIndices);
-    LimitedAccessMatrix<T> result(matrixData_, rowIndices);
+    LimitedAccessMatrix<T> result(matrixData_, getAccessRuleForRow(rowIndex));
     return result;
   } else {
     throw std::out_of_range("Index out of bounds");
@@ -153,9 +157,7 @@ LimitedAccessMatrix<T> Matrix<T>::operator[] (unsigned rowIndex) {
 template<typename T>
 const LimitedAccessMatrix<T> Matrix<T>::operator[] (unsigned rowIndex) const {
   if (rowIndex < shape_.x) {
-    std::vector<unsigned> rowIndices;
-    getIndicesInRow(rowIndex, rowIndices);
-    LimitedAccessMatrix<T> result(matrixData_, rowIndices);
+    LimitedAccessMatrix<T> result(matrixData_, getAccessRuleForRow(rowIndex));
     return result;
   } else {
     throw std::out_of_range("Index out of bounds");
@@ -163,7 +165,7 @@ const LimitedAccessMatrix<T> Matrix<T>::operator[] (unsigned rowIndex) const {
 }
 
 template<typename T>
-T& Matrix<T>::getElementByGlobalIndex(unsigned index) {
+T& Matrix<T>::at(unsigned index) {
   if (index < elementCount_) {
     return matrixData_.get()[index];
   } else {
@@ -172,7 +174,7 @@ T& Matrix<T>::getElementByGlobalIndex(unsigned index) {
 }
 
 template<typename T>
-const T& Matrix<T>::getElementByGlobalIndex(unsigned index) const {
+const T& Matrix<T>::at(unsigned index) const {
   if (index < elementCount_) {
     return matrixData_.get()[index];
   } else {
@@ -209,26 +211,17 @@ bool Matrix<T>::isEmpty() const {
 
 template<typename T>
 bool Matrix<T>::isMultiplicableWith(const Matrix<T>& other) const {
-  return shape_.y == other.getRowCount();
+  return shape_.y == other.shape_.x;
 }
     
 template<typename T>
 bool Matrix<T>::hasSameDimensionWith(const Matrix<T>& other) const {
-  return shape_.x == other.getRowCount() && shape_.y == other.getColCount();
+  return shape_.x == other.shape_.x && shape_.y == other.shape_.y;
 }
 
 template<typename T>
-void Matrix<T>::getIndicesInRow(unsigned rowIndex, std::vector<unsigned>& result) const {
-  for (unsigned index = rowIndex * shape_.y; index < (rowIndex + 1) * shape_.y; index++) {
-    result.push_back(index);
-  }
-}
-
-template<typename T>
-void Matrix<T>::getIndicesInCol(unsigned colIndex, std::vector<unsigned>& result) const {
-  for (unsigned index = colIndex; index < (shape_.x - 2) * (shape_.y) + colIndex; index += shape_.x) {
-    result.push_back(index);
-  }
+AccessRule Matrix<T>::getAccessRuleForRow(unsigned rowIndex) {
+  return AccessRule(rowIndex * shape_.y, (rowIndex+1) * shape_.y - 1, 1);
 }
 
 using matrix_i = Matrix<int>;
