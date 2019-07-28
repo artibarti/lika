@@ -1,5 +1,5 @@
 # Lika
-Header-only math library with vector and matrix utilities
+Header-only matrix class
 
 # Requirements
 Just a c++ compiler and c++11 support
