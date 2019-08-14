@@ -2,7 +2,7 @@
 Header-only matrix class
 
 # Requirements
-Just a c++ compiler and c++11 support
+Just a c++ compiler with c++11 support
 
 # Try out
 After cloning the project, just enter the examples folder and type
